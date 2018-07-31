@@ -1,15 +1,7 @@
-package ex.demo.model;
+package ex.demo;
 
 import java.util.ArrayList;
-
-
-/**
- * Created by Mirza Adil on 6/27/2018.
- * <p>
- * This is a model class for Location Data API.
- */
-
-public class LocationDataModel {
+public class Location {
     private boolean error;
     private String status;
     private ArrayList<LocationData> locationData;

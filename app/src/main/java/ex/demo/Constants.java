@@ -1,6 +1,6 @@
-package ex.demo.contoller.utils;
+package ex.demo;
 
-public class ApplicationConstant {
+public class Constants {
 
 
     public static final String BASE_URL = "https://www.myscrap.com/";

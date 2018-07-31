@@ -1,4 +1,4 @@
-package ex.demo.view.activities;
+package ex.demo;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,11 +11,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import ex.demo.R;
-import ex.demo.contoller.interfaces.APIInterface;
-import ex.demo.contoller.network.APIClient;
-import ex.demo.contoller.utils.ApplicationConstant;
-import ex.demo.model.LocationDataModel;
 
 import java.util.List;
 
@@ -26,17 +21,10 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
-
-/**
- * Created by Mirza Adil on 6/27/2018.
- * <p>
- * This is a  MainActivity class.
- */
-
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private APIInterface apiInterface;
-    private List<LocationDataModel.LocationData> locationDataList;
+    private Interface anInterface;
+    private List<Location.LocationData> locationDataList;
     private LatLng latlng;
     private GoogleMap googleMap;
 
@@ -44,46 +32,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Initializing the Support Map Fragment.
-
         SupportMapFragment mapFragment =new SupportMapFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, mapFragment)
                 .commit();
-        // (SupportMapFragment) getSupportFragmentManager()
-                //.findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
     }
 
-
-    /**
-     * In this method we are call DataLocation Api.
-     */
-
     private void apiCall() {
-        apiInterface = APIClient.getClient().create(APIInterface.class);
-        final Observable<Response<LocationDataModel>> locationdataCall = apiInterface.fetchLocationData(ApplicationConstant.MS_DISCOVER_FUNCTION, ApplicationConstant.API_KEY, ApplicationConstant.USER_ID);
+        anInterface = Client.getClient().create(Interface.class);
+        final Observable<Response<Location>> locationdataCall = anInterface.fetchLocationData(Constants.MS_DISCOVER_FUNCTION, Constants.API_KEY, Constants.USER_ID);
         locationdataCall.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Response<LocationDataModel>>() {
+                .subscribe(new Observer<Response<Location>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                     }
 
                     @Override
-                    public void onNext(Response<LocationDataModel> value) {
+                    public void onNext(Response<Location> value) {
                         if (value.isSuccessful()) {
 
                             locationDataList = value.body().getLocationData();
 
-                            /**
-                             * In this For loop draw 30 Google Map marker.
-                             */
-
-                            for (int i = 0; i < 30; i++) {
+                            for (int i = 0; i < 20; i++) {
                                 latlng = new LatLng(Double.valueOf(locationDataList.get(i).getLatitude()), Double.valueOf(locationDataList.get(i).getLongitude()));
                                 googleMap.addMarker(new MarkerOptions().position(latlng)
                                         .title(locationDataList.get(i).getName()));
@@ -111,10 +83,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-
-        /**
-         * In this method we are call DataLocation Api.
-         */
 
         apiCall();
     }

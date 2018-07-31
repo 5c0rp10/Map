@@ -1,7 +1,6 @@
-package ex.demo.contoller.network;
+package ex.demo;
 
 //import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import ex.demo.contoller.utils.ApplicationConstant;
 
 import java.util.concurrent.TimeUnit;
 
@@ -12,13 +11,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-/**
- * Created by Mirza Adil on 6/27/2018.
- * <p>
- * This class provides the implementation of Retrofit RestClient.
- */
 
-public class APIClient {
+public class Client {
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {
@@ -31,7 +25,7 @@ public class APIClient {
                 .build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl(ApplicationConstant.BASE_URL)
+                .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(client)
