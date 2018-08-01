@@ -5,12 +5,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 
@@ -28,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng latlng;
     private GoogleMap googleMap;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void apiCall() {
+        final ClusterManager<Item> mClusterManager = new ClusterManager<Item>(this, googleMap);
+        googleMap.setOnCameraIdleListener(mClusterManager);
+        googleMap.setOnMarkerClickListener(mClusterManager);
+        googleMap.setOnInfoWindowClickListener(mClusterManager);
         anInterface = Client.getClient().create(Interface.class);
         final Observable<Response<Location>> locationdataCall = anInterface.fetchLocationData(Constants.MS_DISCOVER_FUNCTION, Constants.API_KEY, Constants.USER_ID);
         locationdataCall.subscribeOn(Schedulers.io())
@@ -55,13 +59,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             locationDataList = value.body().getLocationData();
 
-                            for (int i = 0; i < 20; i++) {
+                            for (int i = 0; i < 100; i++) {
                                 latlng = new LatLng(Double.valueOf(locationDataList.get(i).getLatitude()), Double.valueOf(locationDataList.get(i).getLongitude()));
-                                googleMap.addMarker(new MarkerOptions().position(latlng)
-                                        .title(locationDataList.get(i).getName()));
-                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 16f));
+                                mClusterManager.addItem(new Item(Double.parseDouble(locationDataList.get(i).getLatitude()), Double.parseDouble(locationDataList.get(i).getLongitude()), locationDataList.get(i).getName(), locationDataList.get(i).getAddressOne()));
                             }
-
+                            mClusterManager.cluster();
 
                         }
                     }
